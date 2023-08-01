@@ -1,0 +1,5 @@
+"0","rookie_mg_2020_1 <- ggplot(f_stat_2020_1, aes(x = ""Average minutes per game"", y = MP)) + geom_boxplot() + labs(title = ""First Round Rookie Players"", x = NULL, y = ""Minutes"") + theme_minimal() + ylim(0, 48) + theme(plot.title = element_text(size = 10), axis.title.y = element_text(size = 8))"
+"0",""
+"0","rookie_mg_2020_2 <- ggplot(f_stat_2020_2, aes(x = ""Average minutes per game"", y = MP)) + geom_boxplot() + labs(title = ""Second Round Rookie Players"", x = NULL, y = ""Minutes"") + theme_minimal() + ylim(0, 48) + theme(plot.title = element_text(size = 10), axis.title.y = element_text(size = 8))"
+"0",""
+"0","combined_plots_mg_2020 <- rookie_mg_2020_1 + rookie_mg_2020_2 + plot_annotation(title = ""Distribution of Minutes per Game Played by 1st vs. 2nd Round Rookies in 2020"", theme = theme(plot.title = element_text(hjust = 0.5)))"

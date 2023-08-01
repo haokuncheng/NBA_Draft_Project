@@ -1,0 +1,1 @@
+"0","nba_plot_2020_r <- ggplot(nba_2020, aes(x = ""Average Rebounds per Game"", y = TRB)) + geom_boxplot() + labs(title = ""NBA Players 2020"", x = NULL, y = ""Number of Rebounds"") + theme_minimal() + ylim(0, 15) + plot_layout(ncol = 4, widths = c(1.25, 1.5)) + theme(plot.title = element_text(size = 10), axis.title.y = element_text(size = 8))"

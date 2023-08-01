@@ -1,0 +1,50 @@
+"0","nba_2020 <- read_csv(""nba_2020.csv"")"
+"1","[1mRows: [22m[34m540[39m [1mColumns: [22m[34m31[39m
+"
+"1","[36m──[39m [1mColumn specification[22m [36m────────────────────────────────────────────────────────────────────────────────────────────────────[39m
+[1mDelimiter:[22m "",""
+[31mchr[39m  (4): Player, Pos, Tm, Player-additional
+[32mdbl[39m (27): Rk, Age, G, GS, MP, FG, FGA, FG%, 3P, 3PA, 3P%, 2P, 2PA, 2P%, eFG%, FT, FTA, FT%, ORB, DRB, TRB, AST, STL, BLK...
+"
+"1","
+[36mℹ[39m Use `spec()` to retrieve the full column specification for this data.
+[36mℹ[39m Specify the column types or set `show_col_types = FALSE` to quiet this message.
+"
+"0","nba_2021 <- read_csv(""nba_2021.csv"")"
+"1","[1mRows: [22m[34m605[39m [1mColumns: [22m[34m31[39m
+"
+"1","[36m──[39m [1mColumn specification[22m [36m────────────────────────────────────────────────────────────────────────────────────────────────────[39m
+[1mDelimiter:[22m "",""
+[31mchr[39m  (4): Player, Pos, Tm, Player-additional
+[32mdbl[39m (27): Rk, Age, G, GS, MP, FG, FGA, FG%, 3P, 3PA, 3P%, 2P, 2PA, 2P%, eFG%, FT, FTA, FT%, ORB, DRB, TRB, AST, STL, BLK...
+"
+"1","
+[36mℹ[39m Use `spec()` to retrieve the full column specification for this data.
+[36mℹ[39m Specify the column types or set `show_col_types = FALSE` to quiet this message.
+"
+"0","nba_2022 <- read_csv(""nba_2022.csv"")"
+"1","[1mRows: [22m[34m539[39m [1mColumns: [22m[34m31[39m
+"
+"1","[36m──[39m [1mColumn specification[22m [36m────────────────────────────────────────────────────────────────────────────────────────────────────[39m
+[1mDelimiter:[22m "",""
+[31mchr[39m  (4): Player, Pos, Tm, Player-additional
+[32mdbl[39m (27): Rk, Age, G, GS, MP, FG, FGA, FG%, 3P, 3PA, 3P%, 2P, 2PA, 2P%, eFG%, FT, FTA, FT%, ORB, DRB, TRB, AST, STL, BLK...
+"
+"1","
+[36mℹ[39m Use `spec()` to retrieve the full column specification for this data.
+[36mℹ[39m Specify the column types or set `show_col_types = FALSE` to quiet this message.
+"
+"0","name_function <- function(r){"
+"0","    2*pi*r"
+"0","}"
+"0",""
+"0","f_stat_2020 <- nba_2020 %>%"
+"0","  filter(Player %in% c(""Anthony Edwards"",""James Wiseman"",""LaMelo Ball"",""Patrick Williams"",""Isaac Okoro"",""Onyeka Okongwu"",""Killian Hayes"",""Obi Toppin"",""Deni Avdija"",""Jalen Smith"",""Devin Vassell"",""Tyrese Haliburton"",""Kira Lewis Jr."",""Aaron Nesmith"",""Cole Anthony"",""Isaiah Stewart"",""Aleksej Pokusevski"",""Josh Green"",""Saddiq Bey"",""Precious Achiuwa"",""Tyrese Maxey"",""Zeke Nnaji"",""Leandro Bolmaro"",""R.J. Hampton"",""Immanuel Quickley"",""Payton Pritchard"",""Udoka Azubuike"",""Jaden McDaniels"",""Malachi Flynn"",""Desmond Bane""))"
+"0",""
+"0","f_stat_2021 <- nba_2021 %>%"
+"0","  filter(Player %in% c(""Anthony Edwards"",""James Wiseman"",""LaMelo Ball"",""Patrick Williams"",""Isaac Okoro"",""Onyeka Okongwu"",""Killian Hayes"",""Obi Toppin"",""Deni Avdija"",""Jalen Smith"",""Devin Vassell"",""Tyrese Haliburton"",""Kira Lewis Jr."",""Aaron Nesmith"",""Cole Anthony"",""Isaiah Stewart"",""Aleksej Pokusevski"",""Josh Green"",""Saddiq Bey"",""Precious Achiuwa"",""Tyrese Maxey"",""Zeke Nnaji"",""Leandro Bolmaro"",""R.J. Hampton"",""Immanuel Quickley"",""Payton Pritchard"",""Udoka Azubuike"",""Jaden McDaniels"",""Malachi Flynn"",""Desmond Bane""))"
+"0",""
+"0","f_stat_2022 <- nba_2022 %>%"
+"0","  filter(Player %in% c(""Anthony Edwards"",""James Wiseman"",""LaMelo Ball"",""Patrick Williams"",""Isaac Okoro"",""Onyeka Okongwu"",""Killian Hayes"",""Obi Toppin"",""Deni Avdija"",""Jalen Smith"",""Devin Vassell"",""Tyrese Haliburton"",""Kira Lewis Jr."",""Aaron Nesmith"",""Cole Anthony"",""Isaiah Stewart"",""Aleksej Pokusevski"",""Josh Green"",""Saddiq Bey"",""Precious Achiuwa"",""Tyrese Maxey"",""Zeke Nnaji"",""Leandro Bolmaro"",""R.J. Hampton"",""Immanuel Quickley"",""Payton Pritchard"",""Udoka Azubuike"",""Jaden McDaniels"",""Malachi Flynn"",""Desmond Bane""))"
+"0",""
+"0","print(f_stat_2020)"

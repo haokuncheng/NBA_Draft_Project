@@ -1,0 +1,7 @@
+"0","# Load all the packages needed"
+"0","knitr::opts_chunk$set(echo = TRUE)"
+"0","pacman::p_load(tidyverse)"
+"0","library(ggplot2)"
+"0","library(viridisLite)"
+"0","library(patchwork)"
+"0","library(RColorBrewer)"

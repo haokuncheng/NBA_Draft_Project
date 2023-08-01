@@ -1,0 +1,112 @@
+---
+title: "Untitled"
+output: html_document
+---
+We included four data sets in our analysis. These data sets cover NBA players' game-by-game status for the seasons 2020-2021, 2021-2022, and 2022-2023, as well as draft history. 
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+pacman::p_load(tidyverse)
+```
+
+We filtered thirty players from round 1 game of 2020.
+```{r}
+#f refers to filtered
+read_csv("data/draft_history.csv")
+f_draft_history <- draft_history %>%
+  filter(season == 2020) %>%
+  filter(round_number == 1)
+
+draftlist <- unique(f_draft_history$player_name)
+print(draftlist)
+```
+Each of the game-by-game status data sets consists of thirty variables, labeled as V1-V30. 
+These variables are age, team, games, game started, minutes played per game, field goals per game, field goal attempts per game, filed goal percentage, 3-point field goals per game, 3-point field goal attempts per game, 3-point field goal percentage, 2-point field goals per game, 2-point field goal attempts per game, 2-point field goal percentage, effective field goal percentage, free throws per game, free throw attempts per week, free throw percentage, offensive rebounds per game, defensive rebounds per game, total rebounds per game, assists per game, steals per game, blocks per game, turnovers per game, personal fouls per game, and points per game. 
+
+```{r}
+f_stat_2020 <- nba_2020 %>%
+  filter(V2 %in% c("Anthony Edwards","James Wiseman","LaMelo Ball","Patrick Williams","Isaac Okoro","Onyeka Okongwu","Killian Hayes","Obi Toppin","Deni Avdija","Jalen Smith","Devin Vassell","Tyrese Haliburton","Kira Lewis Jr.","Aaron Nesmith","Cole Anthony","Isaiah Stewart","Aleksej Pokusevski","Josh Green","Saddiq Bey","Precious Achiuwa","Tyrese Maxey","Zeke Nnaji","Leandro Bolmaro","R.J. Hampton","Immanuel Quickley","Payton Pritchard","Udoka Azubuike","Jaden McDaniels","Malachi Flynn","Desmond Bane"))
+
+f_stat_2021 <- nba_2021 %>%
+  filter(V2 %in% c("Anthony Edwards","James Wiseman","LaMelo Ball","Patrick Williams","Isaac Okoro","Onyeka Okongwu","Killian Hayes","Obi Toppin","Deni Avdija","Jalen Smith","Devin Vassell","Tyrese Haliburton","Kira Lewis Jr.","Aaron Nesmith","Cole Anthony","Isaiah Stewart","Aleksej Pokusevski","Josh Green","Saddiq Bey","Precious Achiuwa","Tyrese Maxey","Zeke Nnaji","Leandro Bolmaro","R.J. Hampton","Immanuel Quickley","Payton Pritchard","Udoka Azubuike","Jaden McDaniels","Malachi Flynn","Desmond Bane"))
+
+f_stat_2022 <- nba_2022 %>%
+  filter(V2 %in% c("Anthony Edwards","James Wiseman","LaMelo Ball","Patrick Williams","Isaac Okoro","Onyeka Okongwu","Killian Hayes","Obi Toppin","Deni Avdija","Jalen Smith","Devin Vassell","Tyrese Haliburton","Kira Lewis Jr.","Aaron Nesmith","Cole Anthony","Isaiah Stewart","Aleksej Pokusevski","Josh Green","Saddiq Bey","Precious Achiuwa","Tyrese Maxey","Zeke Nnaji","Leandro Bolmaro","R.J. Hampton","Immanuel Quickley","Payton Pritchard","Udoka Azubuike","Jaden McDaniels","Malachi Flynn","Desmond Bane"))
+
+print(f_stat_2020)
+print(f_stat_2021)
+print(f_stat_2022)
+```
+
+
+```{r}
+#a refers to arranged
+specific_order <- c("Anthony Edwards","James Wiseman","LaMelo Ball","Patrick Williams","Isaac Okoro","Onyeka Okongwu","Killian Hayes","Obi Toppin","Deni Avdija","Jalen Smith","Devin Vassell","Tyrese Haliburton","Kira Lewis Jr.","Aaron Nesmith","Cole Anthony","Isaiah Stewart","Aleksej Pokusevski","Josh Green","Saddiq Bey","Precious Achiuwa","Tyrese Maxey","Zeke Nnaji","Leandro Bolmaro","R.J. Hampton","Immanuel Quickley","Payton Pritchard","Udoka Azubuike","Jaden McDaniels","Malachi Flynn","Desmond Bane")
+
+af_stat_2020 <- f_stat_2020 %>%
+  arrange(match(V2, specific_order))
+
+af_stat_2021 <- f_stat_2021 %>%
+  arrange(match(V2, specific_order))
+
+af_stat_2022 <- f_stat_2022 %>%
+  arrange(match(V2, specific_order))
+
+print(af_stat_2020)
+print(af_stat_2021)
+print(af_stat_2022)
+```
+
+
+Leandro Bolmaro: After getting selected in the NBA draft, Bolmaro opted to stay with FC Barcelona for 2020-2021 season
+
+James Wiseman: On April 15 (2021), he underwent successful surgery to repair his torn meniscus and was subsequently ruled out for the remainder of the season.
+
+```{r}
+af_stat_2020$year <- "2020"
+af_stat_2021$year <- "2021"
+af_stat_2022$year <- "2022"
+
+merged_data <- rbind(af_stat_2020, af_stat_2021, af_stat_2022)
+```
+
+```{r}
+library(ggplot2)
+library(viridisLite)
+af_stat_2020$V30 <- as.numeric(af_stat_2020$V30)
+plot_points_2020 <- ggplot(af_stat_2020, aes(x = factor(V2, levels = c("Anthony Edwards","James Wiseman","LaMelo Ball","Patrick Williams","Isaac Okoro","Onyeka Okongwu","Killian Hayes","Obi Toppin","Deni Avdija","Jalen Smith","Devin Vassell","Tyrese Haliburton","Kira Lewis Jr.","Aaron Nesmith","Cole Anthony","Isaiah Stewart","Aleksej Pokusevski","Josh Green","Saddiq Bey","Precious Achiuwa","Tyrese Maxey","Zeke Nnaji","Leandro Bolmaro","R.J. Hampton","Immanuel Quickley","Payton Pritchard","Udoka Azubuike","Jaden McDaniels","Malachi Flynn","Desmond Bane")), y=V30)) + 
+  geom_bar(stat = "identity", aes(fill = factor(V2)), width = 0.3)+ scale_fill_viridis_d()+labs(title = "2020 Performance", x = "Players", y = "Points Per Game")
+plot_points_2020
+```
+
+```{r}
+af_stat_2022$V30 <- as.numeric(af_stat_2022$V30)
+plot_points_2022 <- ggplot(af_stat_2022, aes(x = factor(V2, levels = c("Anthony Edwards","James Wiseman","LaMelo Ball","Patrick Williams","Isaac Okoro","Onyeka Okongwu","Killian Hayes","Obi Toppin","Deni Avdija","Jalen Smith","Devin Vassell","Tyrese Haliburton","Kira Lewis Jr.","Aaron Nesmith","Cole Anthony","Isaiah Stewart","Aleksej Pokusevski","Josh Green","Saddiq Bey","Precious Achiuwa","Tyrese Maxey","Zeke Nnaji","Leandro Bolmaro","R.J. Hampton","Immanuel Quickley","Payton Pritchard","Udoka Azubuike","Jaden McDaniels","Malachi Flynn","Desmond Bane")), y=V30)) + 
+  geom_bar(stat = "identity", aes(fill = factor(V2)), width = 0.3)+ scale_fill_viridis_d()+labs(title = "2022 Performance", x = "Players", y = "Points Per Game")
+plot_points_2022
+```
+
+```{r}
+merged_data$V30 <- as.numeric(merged_data$V30)
+ggplot(merged_data, aes(fill= year, y=V30, x = factor(V2, levels = c("Anthony Edwards","James Wiseman","LaMelo Ball","Patrick Williams","Isaac Okoro","Onyeka Okongwu","Killian Hayes","Obi Toppin","Deni Avdija","Jalen Smith","Devin Vassell","Tyrese Haliburton","Kira Lewis Jr.","Aaron Nesmith","Cole Anthony","Isaiah Stewart","Aleksej Pokusevski","Josh Green","Saddiq Bey","Precious Achiuwa","Tyrese Maxey","Zeke Nnaji","Leandro Bolmaro","R.J. Hampton","Immanuel Quickley","Payton Pritchard","Udoka Azubuike","Jaden McDaniels","Malachi Flynn","Desmond Bane")))) + 
+    geom_bar(position="dodge", stat="identity")+labs(title = "2020-2022 Points Per Game", x = "Players", y = "Points Per Game")+ scale_fill_viridis_d()
+```
+
+```{r}
+merged_data$V24 <- as.numeric(merged_data$V24)
+ggplot(merged_data, aes(fill= year, y=V24, x = factor(V2, levels = c("Anthony Edwards","James Wiseman","LaMelo Ball","Patrick Williams","Isaac Okoro","Onyeka Okongwu","Killian Hayes","Obi Toppin","Deni Avdija","Jalen Smith","Devin Vassell","Tyrese Haliburton","Kira Lewis Jr.","Aaron Nesmith","Cole Anthony","Isaiah Stewart","Aleksej Pokusevski","Josh Green","Saddiq Bey","Precious Achiuwa","Tyrese Maxey","Zeke Nnaji","Leandro Bolmaro","R.J. Hampton","Immanuel Quickley","Payton Pritchard","Udoka Azubuike","Jaden McDaniels","Malachi Flynn","Desmond Bane")))) + 
+    geom_bar(position="dodge", stat="identity")+labs(title = "2020-2022 Total Rebounds Per Game", x = "Players", y = "Total Rebounds Per Game")+scale_fill_viridis_d()
+```
+
+```{r}
+merged_data$V25 <- as.numeric(merged_data$V25)
+ggplot(merged_data, aes(fill= year, y=V25, x = factor(V2, levels = c("Anthony Edwards","James Wiseman","LaMelo Ball","Patrick Williams","Isaac Okoro","Onyeka Okongwu","Killian Hayes","Obi Toppin","Deni Avdija","Jalen Smith","Devin Vassell","Tyrese Haliburton","Kira Lewis Jr.","Aaron Nesmith","Cole Anthony","Isaiah Stewart","Aleksej Pokusevski","Josh Green","Saddiq Bey","Precious Achiuwa","Tyrese Maxey","Zeke Nnaji","Leandro Bolmaro","R.J. Hampton","Immanuel Quickley","Payton Pritchard","Udoka Azubuike","Jaden McDaniels","Malachi Flynn","Desmond Bane")))) + 
+    geom_bar(position="dodge", stat="identity")+labs(title = "2020-2022 Assists Per Game", x = "Players", y = "Assists Per Game")+scale_fill_viridis_d()
+```
+
+```{r}
+merged_data$V26 <- as.numeric(merged_data$V26)
+ggplot(merged_data, aes(fill= year, y=V26, x = factor(V2, levels = c("Anthony Edwards","James Wiseman","LaMelo Ball","Patrick Williams","Isaac Okoro","Onyeka Okongwu","Killian Hayes","Obi Toppin","Deni Avdija","Jalen Smith","Devin Vassell","Tyrese Haliburton","Kira Lewis Jr.","Aaron Nesmith","Cole Anthony","Isaiah Stewart","Aleksej Pokusevski","Josh Green","Saddiq Bey","Precious Achiuwa","Tyrese Maxey","Zeke Nnaji","Leandro Bolmaro","R.J. Hampton","Immanuel Quickley","Payton Pritchard","Udoka Azubuike","Jaden McDaniels","Malachi Flynn","Desmond Bane")))) + 
+    geom_bar(position="dodge", stat="identity")+labs(title = "2020-2022 Steals Per Game", x = "Players", y = "Steals Per Game")+scale_fill_viridis_d()
+```
+

@@ -1,0 +1,512 @@
+---
+title: "EDA Code Notebook Draft"
+output: html_document
+author: Haokun Cheng and Penny Hong
+---
+
+```{r setup, include=FALSE}
+# Load all the packages needed
+knitr::opts_chunk$set(echo = TRUE)
+pacman::p_load(tidyverse)
+library(ggplot2)
+library(viridisLite)
+library(patchwork)
+library(RColorBrewer)
+```
+
+## Introduction to Datasets
+
+Four datasets were collected from two websites to facilitate this exploratory analysis. As all datasets were publicly available, no specific ethical considerations were involved in this analysis. 
+
+The first website we used is Kaggle, a renowned source that is highly popular among data scientists and machine learning practitioners and frequently recommended by professors for retrieving data. It supplied a dataset containing the names of all rookie players from the 2020 NBA Draft, including players selected in both Round 1 and Round 2, resulting in a total of 60 players. This dataset includes comprehensive information about each rookie player's draft round and associated organizations, comprising 14 variables:
+
+`player_id`: A unique identifier assigned to each individual by the data provider. \
+`player_name`: Players’ names as they appeared during the game season. \
+`season`: The year in which the player participated. \
+`round_number`: The round in which the player participated, which can be either Round 1 or Round 2.\
+`round_pick`: The player’s selection order within their chosen round, ranging from 1 to 30.\
+`overall_pick`: An indicator that considers both the round number and the round pick. For players selected in Round 1, their overall pick remains identical to their round pick. For players selected in Round 2, their overall pick is calculated as 30 plus their round pick number.\
+`draft_type`: “Unknown” since it was not explained by the data provider and is not included in our data analysis.\
+`team_id`: A unique identifier assigned to each team by the data provider. \
+`team_city`: The city where the team’s home games are hosted.\
+`team_name`: Teams’ names as they appeared during the game season. \
+`team_abbreviation`: Teams’ abbreviations as they appeared during the game season.\
+`organization`: “Unknown” since it was not explained by the data provider and is not included in our data analysis.\
+`organization_type`: “Unknown” since it was not explained by the data provider and is not included in our data analysis.\
+`player_profile_flag`: “Unknown” since it was not explained by the data provider and is not included in our data analysis.
+
+
+The second website we used is Basketball Reference, which is part of Sports Reference, a platform launched in 2000 with the goal of democratizing access to reliable sports data. From the first website, we obtained three datasets encompassing NBA players’ performance data for the seasons 2020-2021, 2021-2022, and 2022-2023. Each dataset comprises thirty variables, including: 
+
+`Rk`: Ranked alphabetically according to each player’s last name.\
+`Player`: Players’ names as they appeared during the game season. \
+`Pos`: Position.\
+`Age`: Players age on February 1 of the season. \
+`TM`: Team games.\
+`G`: Games.\
+`GS`: Games started.\
+`MP`: Minutes played per game.\
+`FG`: Field goals per game. \
+`FGA`: Field goal attempts per game.\
+`FG%`: Field goal percentage.\
+`3P`: 3-point field goals per game.\
+`3PA`: 3-point field goal attempts per game.\
+`3p%`: 3-point field goal percentage.\
+`2P`: 2-point field goals per game.\
+ `2PA`: 2-point field goal attempts per game.\
+`2P%`: 2-point field goal percentage.\
+`eFG%`: Effective field goal percentage.\
+`FT`: Free throws per game.\
+`FTA`: Free throw attempts per game.\
+`FT%`: Free throw percentage.\
+`ORB`: Offensive rebounds per game.\
+`DRB`: Defensive rebounds per game.\
+`TRB`: Total rebounds per game.\
+`AST`: Assists per game.\
+`STL`: Steals per game.\
+`BLK`: Blocks per game.\
+`TOV`: Turnovers per game.\
+`PF`: Personal fouls per game.\
+`PTS`: Points per game.\
+
+```{r}
+# Load all 4 datasets 
+draft_history <- read_csv("draft_history.csv")
+nba_2020 <- read_csv("nba_2020.csv")
+nba_2021 <- read_csv("nba_2021.csv")
+nba_2022 <- read_csv("nba_2022.csv")
+```
+
+## Basic Data Processing
+
+We can now use `draft_history` to obtain a name list of rookies in any year. We will apply 2020 season's draft.
+
+```{r}
+# Filter out all 60 rookie names that were picked by the 2020 NBA draft (first round and second round)
+# "f" refers to filtered
+f_draft_history <- draft_history %>%
+  filter(season == 2020) %>%
+  filter(round_number == 1 | round_number == 2)
+
+draftlist <- unique(f_draft_history$player_name)
+print(draftlist)
+```
+
+Then, we are able to use the name list obtain from `draft_history` to filter out the players' stats from `nba_2020`, `nba_2021`, and `nba_2022`.
+
+```{r}
+# Create function to filter out the rookies' stats
+name_function <- function(data_nba){
+    data_nba %>%
+  filter(Player %in% c("Anthony Edwards", "James Wiseman", "LaMelo Ball", "Patrick Williams", "Isaac Okoro", "Onyeka Okongwu", "Killian Hayes", "Obi Toppin", "Deni Avdija", "Jalen Smith", "Devin Vassell", "Tyrese Haliburton", "Kira Lewis Jr.", "Aaron Nesmith", "Cole Anthony", "Isaiah Stewart", "Aleksej Pokusevski", "Josh Green", "Saddiq Bey", "Precious Achiuwa", "Tyrese Maxey", "Zeke Nnaji", "Leandro Bolmaro", "R.J. Hampton", "Immanuel Quickley", "Payton Pritchard", "Udoka Azubuike", "Jaden McDaniels", "Malachi Flynn", "Desmond Bane", "Tyrell Terry", "Vernon Carey Jr.", "Daniel Oturu", "Theo Maledon", "Xavier Tillman", "Tyler Bey", "Vit Krejci", "Saben Lee", "Elijah Hughes", "Robert Woodard II", "Tre Jones", "Nick Richards", "Jahmi'us Ramsey", "Marko Simonovic", "Jordan Nwora", "CJ Elleby", "Yam Madar", "Nico Mannion", "Isaiah Joe", "Skylar Mays", "Justinian Jessup", "Kenyon Martin Jr.", "Cassius Winston", "Cassius Stanley", "Jay Scrubb", "Grant Riller", "Reggie Perry", "Paul Reed", "Jalen Harris", "Sam Merrill"))
+}
+
+# Apply the function to create new data frames
+f_stat_2020 <- name_function(nba_2020)
+
+f_stat_2021 <- name_function(nba_2021)
+
+f_stat_2022 <- name_function(nba_2022)
+```
+
+## Basic Data Visualization and Analysis
+
+Now we are able to use box plots to compare some basic stats between the average of NBA players and the average of 2020 Rookies.
+
+We will compare three aspects: points, rebounds, and assits as they are the three essential data to value a NBA player.
+
+### Points 
+
+```{r}
+# Create box plots
+nba_plot_2020_p <- ggplot(nba_2020, aes(x = "Average Points per Game", y = PTS)) + geom_boxplot() + labs(title = "NBA Players 2020", x = NULL, y = "Points") + theme_minimal() + ylim(0, 35) + plot_layout(ncol = 4, widths = c(1.25, 1.5)) + theme(plot.title = element_text(size = 10), axis.title.y = element_text(size = 8))
+
+rookie_plot_2020_p <- ggplot(f_stat_2020, aes(x = "Average Points per Game", y = PTS)) + geom_boxplot() + labs(title = "Rookie Players 2020", x = NULL, y = "Points") + theme_minimal() + ylim(0, 35) + theme(plot.title = element_text(size = 10), axis.title.y = element_text(size = 8))
+
+nba_plot_2022_p <- ggplot(nba_2022, aes(x = "Average Points per Game", y = PTS)) + geom_boxplot() + labs(title = "NBA Players 2022", x = NULL, y = "Points") + theme_minimal() + ylim(0, 35) + theme(plot.title = element_text(size = 10), axis.title.y = element_text(size = 8))
+
+rookie_plot_2022_p <- ggplot(f_stat_2022, aes(x = "Average Points per Game", y = PTS)) + geom_boxplot() + labs(title = "Rookie Players 2022", x = NULL, y = "Points") + theme_minimal() + ylim(0, 35) + theme(plot.title = element_text(size = 10), axis.title.y = element_text(size = 8))
+
+# Combine plots into one graphic element
+combined_plots_points <- nba_plot_2020_p + rookie_plot_2020_p + nba_plot_2022_p + rookie_plot_2022_p + plot_annotation(title = "Distribution of Average Points for NBA Players vs. Rookie Players in 2020 and 2022", theme = theme(plot.title = element_text(hjust = 0.5)))
+
+print(combined_plots_points)
+```
+
+We are also able to calculate the central tendency with our new data frames.
+
+```{r}
+# Create function to calculate central tendency
+calculate_central_tendency <- function(nba_2020, f_stat_2020, nba_2022, f_stat_2022, variable_name) {
+  # Calculate central tendency measures for NBA players 2020
+  nba_mean_2020 <- mean(nba_2020[[variable_name]])
+  nba_median_2020 <- median(nba_2020[[variable_name]])
+  nba_25quantile_2020 <- quantile(nba_2020[[variable_name]], probs = 0.25)
+  nba_75quantile_2020 <- quantile(nba_2020[[variable_name]], probs = 0.75)
+  
+  # Calculate central tendency measures for Rookie players 2020
+  rookie_mean_2020 <- mean(f_stat_2020[[variable_name]])
+  rookie_median_2020 <- median(f_stat_2020[[variable_name]])
+  rookie_25quantile_2020 <- quantile(f_stat_2020[[variable_name]], probs = 0.25)
+  rookie_75quantile_2020 <- quantile(f_stat_2020[[variable_name]], probs = 0.75)
+  
+  # Calculate central tendency measures for NBA players 2022
+  nba_mean_2022 <- mean(nba_2022[[variable_name]])
+  nba_median_2022 <- median(nba_2022[[variable_name]])
+  nba_25quantile_2022 <- quantile(nba_2022[[variable_name]], probs = 0.25)
+  nba_75quantile_2022 <- quantile(nba_2022[[variable_name]], probs = 0.75)
+  
+  # Calculate central tendency measures for Rookie players 2022
+  rookie_mean_2022 <- mean(f_stat_2022[[variable_name]])
+  rookie_median_2022 <- median(f_stat_2022[[variable_name]])
+  rookie_25quantile_2022 <- quantile(f_stat_2022[[variable_name]], probs = 0.25)
+  rookie_75quantile_2022 <- quantile(f_stat_2022[[variable_name]], probs = 0.75)
+  
+  # Create the central tendency data frame
+  central_tendency_df <- data.frame(
+    Data = c("NBA Players 2020", "Rookie Players 2020", "NBA Players 2022", "Rookie Players 2022"),
+    Mean = c(nba_mean_2020, rookie_mean_2020, nba_mean_2022, rookie_mean_2022),
+    Median = c(nba_median_2020, rookie_median_2020, nba_median_2022, rookie_median_2022),
+    LQuartile = c(nba_25quantile_2020, rookie_25quantile_2020, nba_25quantile_2022, rookie_25quantile_2022),
+    UQuartile = c(nba_75quantile_2020, rookie_75quantile_2020, nba_75quantile_2022, rookie_75quantile_2022)
+  )
+  
+  return(central_tendency_df)
+}
+
+result_df_points <- calculate_central_tendency(nba_2020, f_stat_2020, nba_2022, f_stat_2022, variable_name = "PTS")
+
+# Print the resulting data frame
+print(result_df_points)
+
+```
+
+We conducted visualizations of the distribution of average points earned per game for both NBA players and rookie players in both 2020 and 2022, and we also presented the mean value to achieve the following objectives (Note: the year 2021 was excluded because our goal was to present a trajectory over the rookie players’ three-year development):
+
+1. Compare the performance of rookie players with NBA players in 2020, immediately after their draft, to identify any significant differences.
+
+In 2020, NBA players averaged 8.942 points per game, which was 3.072 points higher than the average for rookie players. The 75th percentile data indicate that 75% of the rookie players scored 8 points or lower, significantly lower than the 75th percentile of NBA players, which was 12.4 points. Moreover, the 75th percentile of rookie players is lower than the mean scores per game of NBA players. Similarly, the 25th percentile data for the rookie players were as low as 2.6 points per game, while 25% of NBA players scored 4.1 points. These findings highlight that even the best rookie players fell short of the average performance of NBA players, indicating a substantial gap in scores between the two groups during 2020.
+
+
+2. Compare the performance of rookie players with NBA players in 2022 to identify any changes that have emerged since 2020 as well as the self-development of rookie players between 2020 and 2022.
+
+All types of rookie players demonstrated significant improvements to an extent that their performances surpassed those of NBA players, with their mean being 0.767 points higher. The average points for the top 25% of rookies improved from 8.0 in 2020 to 12.8 in 2022, 0.7 points higher than that of the NBA players, compared to a difference of 4.4 points in 2020. Additionally, the median rookie players improved by a total of 4.2 points since 2020, and the lower 25% of rookie players improved by a total of 4.02 points, each surpassing the NBA players' performance by 2.2 and 1.65 points per game, respectively. 
+
+### Rebounds
+
+```{r}
+nba_plot_2020_r <- ggplot(nba_2020, aes(x = "Average Rebounds per Game", y = TRB)) + geom_boxplot() + labs(title = "NBA Players 2020", x = NULL, y = "Number of Rebounds") + theme_minimal() + ylim(0, 15) + plot_layout(ncol = 4, widths = c(1.25, 1.5)) + theme(plot.title = element_text(size = 10), axis.title.y = element_text(size = 8))
+
+rookie_plot_2020_r <- ggplot(f_stat_2020, aes(x = "Average Rebounds per Game", y = TRB)) + geom_boxplot() + labs(title = "Rookie Players 2020", x = NULL, y = "Number of Rebounds") + theme_minimal() + ylim(0, 15) + theme(plot.title = element_text(size = 10), axis.title.y = element_text(size = 8))
+
+nba_plot_2022_r <- ggplot(nba_2022, aes(x = "Average Rebounds per Game", y = TRB)) + geom_boxplot() + labs(title = "NBA Players 2022", x = NULL, y = "Number of Rebounds") + theme_minimal() + ylim(0, 15) + theme(plot.title = element_text(size = 10), axis.title.y = element_text(size = 8))
+
+rookie_plot_2022_r <- ggplot(f_stat_2022, aes(x = "Average Rebounds per Game", y = TRB)) + geom_boxplot() + labs(title = "Rookie Players 2022", x = NULL, y = "Number of Rebounds") + theme_minimal() + ylim(0, 15) + theme(plot.title = element_text(size = 10), axis.title.y = element_text(size = 8))
+
+combined_plots_rebounds <- nba_plot_2020_r + rookie_plot_2020_r + nba_plot_2022_r + rookie_plot_2022_r + plot_annotation(title = "Distribution of Average Rebounds for NBA Players vs. Rookie Players in 2020 and 2022", theme = theme(plot.title = element_text(hjust = 0.5)))
+
+print(combined_plots_rebounds)
+```
+
+```{r}
+result_df_rebounds <- calculate_central_tendency(nba_2020, f_stat_2020, nba_2022, f_stat_2022, variable_name = "TRB")
+
+print(result_df_rebounds)
+```
+
+Just like how we visualized the distribution of average points earned per game, we also explored the distribution of rebounds per game and presented the mean value, and investigated a similar pattern as observed in the distribution of average points earned per game:
+
+1. Similar to the distribution of average points in 2020, the NBA players outperform the rookie players in getting rebounds in all groups: the top 25% of players have 1.4 more rebounds per game, 1.1 more rebounds for the median players, and 0.8 more for the lower 25% players. 
+
+
+2. Over the course of three seasons, rookie players demonstrated significant progress and outperformed their NBA counterparts across the lower 25% to the upper 25% percentiles in terms of rebounds. Specifically, rookie players showed an average increase of 1.266 more rebounds from 2020 to 2022, while the median rebounds for NBA players decreased slightly by 0.09. Notably, the median players displayed the most distinguishable improvement, increasing by 1.6 more rebounds from 2.1 to 3.7. The upper quartile closely followed, improving from 3.4 to 4.9, totaling 1.5 more rebounds. Even the lower quartile showed noticeable growth, increasing by 1.35 more rebounds from 1.1 to 2.45.
+
+### Assists
+
+```{r}
+nba_plot_2020_a <- ggplot(nba_2020, aes(x = "Average Assists per Game", y = AST)) + geom_boxplot() + labs(title = "NBA Players 2020", x = NULL, y = "Number of Assists") + theme_minimal() + ylim(0, 13) + plot_layout(ncol = 4, widths = c(1.25, 1.5)) + theme(plot.title = element_text(size = 10), axis.title.y = element_text(size = 8))
+
+rookie_plot_2020_a <- ggplot(f_stat_2020, aes(x = "Average Assists per Game", y = AST)) + geom_boxplot() + labs(title = "Rookie Players 2020", x = NULL, y = "Number of Assists") + theme_minimal() + ylim(0, 13) + theme(plot.title = element_text(size = 10), axis.title.y = element_text(size = 8))
+
+nba_plot_2022_a <- ggplot(nba_2022, aes(x = "Average Assists per Game", y = AST)) + geom_boxplot() + labs(title = "NBA Players 2022", x = NULL, y = "Number of Assists") + theme_minimal() + ylim(0, 13) + theme(plot.title = element_text(size = 10), axis.title.y = element_text(size = 8))
+
+rookie_plot_2022_a <- ggplot(f_stat_2022, aes(x = "Average Assists per Game", y = AST)) + geom_boxplot() + labs(title = "Rookie Players 2022", x = NULL, y = "Number of Assists") + theme_minimal() + ylim(0, 13) + theme(plot.title = element_text(size = 10), axis.title.y = element_text(size = 8))
+
+combined_plots_assists <- nba_plot_2020_a + rookie_plot_2020_a + nba_plot_2022_a + rookie_plot_2022_a + plot_annotation(title = "Distribution of Average Assists for NBA Players vs. Rookie Players in 2020 and 2022", theme = theme(plot.title = element_text(hjust = 0.5)))
+
+print(combined_plots_assists)
+```
+
+```{r}
+result_df_assists <- calculate_central_tendency(nba_2020, f_stat_2020, nba_2022, f_stat_2022, variable_name = "AST")
+
+print(result_df_assists)
+```
+
+As we visualize and compare the distribution of average assists made per game, we found a different pattern compared to the average points gained and the average rebounds taken:
+
+1. Similar to the other two distributions analyzed earlier, rookie players started with weaker performances compared to NBA players in terms of assists. On average, they made 0.68 fewer assists than NBA players, with the median population assisting half as much. The upper quartile assisted 1.3 times less, and the lower quartile assisted 0.3 times less.
+
+2. After three years, the average assists of rookie players did surpass that of NBA players, following a pattern similar to the other two distributions, by making 0.22 more assists in 2022. However, the median population did not follow the previous pattern. Specifically, while the median rookie players improved by 0.5 more assists from 2020 to 2022, and the NBA players made no progress over the three years, the rookie players are still 0.1 assists per game behind the NBA players.
+
+## In-Depth Data Processing and Anlaysis
+
+In this section, we will separate the rookies based one the round number they were selected.
+
+### General Stats
+
+```{r}
+# Use the name list obtain from `draft_history` to filter out the players' stats from `nba_2020`, `nba_2021`, and `nba_2022`
+
+# Create function to filter out the first round rookies' stats
+name_function1 <- function(data_nba){
+    data_nba %>%
+  filter(Player %in% c("Anthony Edwards", "James Wiseman", "LaMelo Ball", "Patrick Williams", "Isaac Okoro", "Onyeka Okongwu", "Killian Hayes", "Obi Toppin", "Deni Avdija", "Jalen Smith", "Devin Vassell", "Tyrese Haliburton", "Kira Lewis Jr.", "Aaron Nesmith", "Cole Anthony", "Isaiah Stewart", "Aleksej Pokusevski", "Josh Green", "Saddiq Bey", "Precious Achiuwa", "Tyrese Maxey", "Zeke Nnaji", "Leandro Bolmaro", "R.J. Hampton", "Immanuel Quickley", "Payton Pritchard", "Udoka Azubuike", "Jaden McDaniels", "Malachi Flynn", "Desmond Bane"))
+}
+
+# Create function to filter out the second round rookies' stats
+name_function2 <- function(data_nba){
+    data_nba %>%
+  filter(Player %in% c("Tyrell Terry", "Vernon Carey Jr.", "Daniel Oturu", "Theo Maledon", "Xavier Tillman", "Tyler Bey", "Vit Krejci", "Saben Lee", "Elijah Hughes", "Robert Woodard II", "Tre Jones", "Nick Richards", "Jahmi'us Ramsey", "Marko Simonovic", "Jordan Nwora", "CJ Elleby", "Yam Madar", "Nico Mannion", "Isaiah Joe", "Skylar Mays", "Justinian Jessup", "Kenyon Martin Jr.", "Cassius Winston", "Cassius Stanley", "Jay Scrubb", "Grant Riller", "Reggie Perry", "Paul Reed", "Jalen Harris", "Sam Merrill"))
+}
+
+# Apply functions to create new data frames
+# `_1` and `_2` in variable names indicate first round and second round
+f_stat_2020_1 <- name_function1(nba_2020)
+
+f_stat_2020_2 <- name_function2(nba_2020)
+
+f_stat_2021_1 <- name_function1(nba_2021)
+
+f_stat_2021_2 <- name_function2(nba_2021)
+
+f_stat_2022_1 <- name_function1(nba_2022)
+
+f_stat_2022_2 <- name_function2(nba_2022)
+```
+
+We can now use histogram and pie charts to visualize the data frames we just created (Note: we will include information from the year 2020 only, as the data covered had not changed much over the subsequent years). 
+
+```{r}
+# Create the histogram of Age Distribution of NBA Players in 2020-2021 Season
+histogram <- ggplot(nba_2020, aes(x = Age)) +
+  geom_histogram(binwidth = 1, boundary = 17.5, closed = "right", fill = "light blue", color = "black") +
+  labs(title = "Age Distribution of NBA Players",
+       x = "Age",
+       y = "Number of Players")
+
+# Display the histogram
+print(histogram)
+```
+
+The age distribution of NBA players ranges from 19 to 40 years old. It exhibits a pronounced left-skew, resulting in a longer tail on the right side of the distribution. That being said, the majority of players are clustered toward the lower age values, particularly between 21 to 25 years old, with 23 being the peak age. On the other hand, there are fewer players within the older age range, with only a few players between 35 to 40 years old, and no players above 40. 
+
+```{r}
+# Calculate the count of players for each position
+position_counts_1 <- table(f_stat_2020_1$Pos)
+position_counts_2 <- table(f_stat_2020_2$Pos)
+
+# Create a data frame to store the position counts
+nba_positions_1 <- data.frame(Position = names(position_counts_1), Count = as.vector(position_counts_1))
+nba_positions_2 <- data.frame(Position = names(position_counts_2), Count = as.vector(position_counts_2))
+
+# Order the positions to ensure correct ordering in the pie chart
+nba_positions_1$Position <- factor(nba_positions_1$Position, levels = c("PG", "C", "PF", "SG", "SF"))
+nba_positions_2$Position <- factor(nba_positions_2$Position, levels = c("PG", "C", "PF", "SG", "SF"))
+
+# Create the pie chart using ggplot2
+pie_chart_1 <- ggplot(nba_positions_1, aes(x = "", y = Count, fill = Position)) +
+  geom_bar(stat = "identity", width = 1) +
+  labs(title = "Rookies from the First Round") + 
+  coord_polar("y", start = 0) +
+  scale_fill_brewer(palette = "Blues") +
+  theme_void() +
+  theme(legend.position = "right") + 
+  theme(plot.title = element_text(size = 10))
+
+pie_chart_2 <- ggplot(nba_positions_2, aes(x = "", y = Count, fill = Position)) +
+  geom_bar(stat = "identity", width = 1) +
+  labs(title = "Rookies from the Second Round") + 
+  coord_polar("y", start = 0) +
+  scale_fill_brewer(palette = "Blues") +
+  theme_void() +
+  theme(legend.position = "right") + 
+  theme(plot.title = element_text(size = 10))
+
+# Combine the pie charts together so they can be displayed in one graphic element
+combined_pie_charts <- pie_chart_1 + pie_chart_2 + plot_annotation(title = "Pie Charts of the Ratio ", theme = theme(plot.title = element_text(hjust = 0.5)))
+
+# Display the pie charts
+print(combined_pie_charts)
+```
+
+In Round 1, 29 out of 30 people competed in 2020, and in Round 2, 24 out of 30 people participated in the same year. The absences were due to injuries, commitments to other leagues, or not being selected by any team to participate. Therefore, the left pie chart shows a total of 29 people, while the right pie chart shows a total of 30.
+Proportionally, this graph illustrates that point guards are the most commonly selected positions in both rounds. Centers and power forwards are more prevalent in the first round, while small forwards and shooting guards are more common in the second round.
+
+### Individual Stats
+
+In order to display rookies' performances categoraized by their positions and see their performance trend in 3 continous years, we need to first modify our data frames again.
+
+```{r}
+# Add a new variable named `year` for combining the data frames in the future
+f_stat_2020_1$year <- "2020"
+f_stat_2020_2$year <- "2020"
+f_stat_2021_1$year <- "2021"
+f_stat_2021_2$year <- "2021"
+f_stat_2022_1$year <- "2022"
+f_stat_2022_2$year <- "2022"
+
+# Create function to filter rookie players into subsets according to their positions
+f_pos_stat <- function(dataset, variable_name){
+  dataset %>%
+    filter(Pos == variable_name)
+}
+
+# Apply functions to create new data frames
+# `_1` and `_2` in variable names indicate first round and second round
+# `_pg`, `_c`, `_pf`, `_sg` and `_sf` in variable names indicate the five positions in basketball
+f_2020_1_pg <- f_pos_stat(f_stat_2020_1, "PG")
+f_2020_1_c <- f_pos_stat(f_stat_2020_1, "C")
+f_2020_1_pf <- f_pos_stat(f_stat_2020_1, "PF")
+f_2020_1_sg <- f_pos_stat(f_stat_2020_1, "SG")
+f_2020_1_sf <- f_pos_stat(f_stat_2020_1, "SF")
+
+f_2020_2_pg <- f_pos_stat(f_stat_2020_2, "PG")
+f_2020_2_c <- f_pos_stat(f_stat_2020_2, "C")
+f_2020_2_pf <- f_pos_stat(f_stat_2020_2, "PF")
+f_2020_2_sg <- f_pos_stat(f_stat_2020_2, "SG")
+f_2020_2_sf <- f_pos_stat(f_stat_2020_2, "SF")
+
+f_2021_1_pg <- f_pos_stat(f_stat_2021_1, "PG")
+f_2021_1_c <- f_pos_stat(f_stat_2021_1, "C")
+f_2021_1_pf <- f_pos_stat(f_stat_2021_1, "PF")
+f_2021_1_sg <- f_pos_stat(f_stat_2021_1, "SG")
+f_2021_1_sf <- f_pos_stat(f_stat_2021_1, "SF")
+
+f_2021_2_pg <- f_pos_stat(f_stat_2021_2, "PG")
+f_2021_2_c <- f_pos_stat(f_stat_2021_2, "C")
+f_2021_2_pf <- f_pos_stat(f_stat_2021_2, "PF")
+f_2021_2_sg <- f_pos_stat(f_stat_2021_2, "SG")
+f_2021_2_sf <- f_pos_stat(f_stat_2021_2, "SF")
+
+f_2022_1_pg <- f_pos_stat(f_stat_2022_1, "PG")
+f_2022_1_c <- f_pos_stat(f_stat_2022_1, "C")
+f_2022_1_pf <- f_pos_stat(f_stat_2022_1, "PF")
+f_2022_1_sg <- f_pos_stat(f_stat_2022_1, "SG")
+f_2022_1_sf <- f_pos_stat(f_stat_2022_1, "SF")
+
+f_2022_2_pg <- f_pos_stat(f_stat_2022_2, "PG")
+f_2022_2_c <- f_pos_stat(f_stat_2022_2, "C")
+f_2022_2_pf <- f_pos_stat(f_stat_2022_2, "PF")
+f_2022_2_sg <- f_pos_stat(f_stat_2022_2, "SG")
+f_2022_2_sf <- f_pos_stat(f_stat_2022_2, "SF")
+
+# Merge data frames of different seasons together to create new data frames with `rbind()`
+merged_1_pg <- rbind(f_2020_1_pg, f_2021_1_pg, f_2022_1_pg)
+merged_1_c <- rbind(f_2020_1_c, f_2021_1_c, f_2022_1_c)
+merged_1_pf <- rbind(f_2020_1_pf, f_2021_1_pf, f_2022_1_pf)
+merged_1_sg <- rbind(f_2020_1_sg, f_2021_1_sg, f_2022_1_sg)
+merged_1_sf <- rbind(f_2020_1_sf, f_2021_1_sf, f_2022_1_sf)
+
+merged_2_pg <- rbind(f_2020_2_pg, f_2021_2_pg, f_2022_2_pg)
+merged_2_c <- rbind(f_2020_2_c, f_2021_2_c, f_2022_2_c)
+merged_2_pf <- rbind(f_2020_2_pf, f_2021_2_pf, f_2022_2_pf)
+merged_2_sg <- rbind(f_2020_2_sg, f_2021_2_sg, f_2022_2_sg)
+merged_2_sf <- rbind(f_2020_2_sf, f_2021_2_sf, f_2022_2_sf)
+```
+
+Now we are ready to visualize the new data frames we just created.
+
+```{r}
+# Create bar chart for first round rookies who registered as point guards
+# Creating levels allows x-axis to present player names in the order of draft picks (from left to right)
+plot_1_pg <- ggplot(merged_1_pg, aes(fill = year, x = factor(Player, levels = c("Anthony Edwards","James Wiseman","LaMelo Ball","Patrick Williams","Isaac Okoro","Onyeka Okongwu","Killian Hayes","Obi Toppin","Deni Avdija","Jalen Smith","Devin Vassell","Tyrese Haliburton","Kira Lewis Jr.","Aaron Nesmith","Cole Anthony","Isaiah Stewart","Aleksej Pokusevski","Josh Green","Saddiq Bey","Precious Achiuwa","Tyrese Maxey","Zeke Nnaji","Leandro Bolmaro","R.J. Hampton","Immanuel Quickley","Payton Pritchard","Udoka Azubuike","Jaden McDaniels","Malachi Flynn","Desmond Bane")), y = AST)) + 
+  geom_bar(position = "dodge", stat = "identity", width = 0.5) + 
+  scale_fill_viridis_d() + 
+  labs(title = "First Round Rookie Point Guard Assists Performance", x = "Players from Higest to Lowest Draft Pick", y = "Assists Per Game") + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# Display the bar chart
+print(plot_1_pg)
+```
+
+```{r}
+# Create bar chart for second round rookies who registered as point guards
+# Creating levels allows x-axis to present player names in the order of draft picks (from left to right)
+plot_2_pg <- ggplot(merged_2_pg, aes(fill = year, x = factor(Player, levels = c("Tyrell Terry", "Vernon Carey Jr.", "Daniel Oturu", "Theo Maledon", "Xavier Tillman", "Tyler Bey", "Vit Krejci", "Saben Lee", "Elijah Hughes", "Robert Woodard II", "Tre Jones", "Nick Richards", "Jahmi'us Ramsey", "Marko Simonovic", "Jordan Nwora", "CJ Elleby", "Yam Madar", "Nico Mannion", "Isaiah Joe", "Skylar Mays", "Justinian Jessup", "Kenyon Martin Jr.", "Cassius Winston", "Cassius Stanley", "Jay Scrubb", "Grant Riller", "Reggie Perry", "Paul Reed", "Jalen Harris", "Sam Merrill")), y = AST)) + 
+  geom_bar(position = "dodge", stat = "identity", width = 0.5) + 
+  scale_fill_viridis_d() + 
+  labs(title = "Second Round Rookie Point Guard Assists Performance", x = "Players from Higest to Lowest Draft Pick", y = "Assists Per Game") + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# Display the bar chart
+print(plot_2_pg)
+```
+
+```{r}
+# Create bar chart for first round rookies who registered as Centers
+# Creating levels allows x-axis to present player names in the order of draft picks (from left to right)
+plot_1_c <- ggplot(merged_1_c, aes(fill = year, x = factor(Player, levels = c("Anthony Edwards","James Wiseman","LaMelo Ball","Patrick Williams","Isaac Okoro","Onyeka Okongwu","Killian Hayes","Obi Toppin","Deni Avdija","Jalen Smith","Devin Vassell","Tyrese Haliburton","Kira Lewis Jr.","Aaron Nesmith","Cole Anthony","Isaiah Stewart","Aleksej Pokusevski","Josh Green","Saddiq Bey","Precious Achiuwa","Tyrese Maxey","Zeke Nnaji","Leandro Bolmaro","R.J. Hampton","Immanuel Quickley","Payton Pritchard","Udoka Azubuike","Jaden McDaniels","Malachi Flynn","Desmond Bane")), y = TRB)) + 
+  geom_bar(position = "dodge", stat = "identity", width = 0.5) + 
+  scale_fill_viridis_d() + 
+  labs(title = "First Round Rookie Center Rebounds Performance", x = "Players from Higest to Lowest Draft Pick", y = "Rebounds Per Game") + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# Display the bar chart
+print(plot_1_c)
+```
+
+```{r}
+# Create bar chart for second round rookies who registered as centers
+# Creating levels allows x-axis to present player names in the order of draft picks (from left to right)
+plot_2_c <- ggplot(merged_2_c, aes(fill = year, x = factor(Player, levels = c("Tyrell Terry", "Vernon Carey Jr.", "Daniel Oturu", "Theo Maledon", "Xavier Tillman", "Tyler Bey", "Vit Krejci", "Saben Lee", "Elijah Hughes", "Robert Woodard II", "Tre Jones", "Nick Richards", "Jahmi'us Ramsey", "Marko Simonovic", "Jordan Nwora", "CJ Elleby", "Yam Madar", "Nico Mannion", "Isaiah Joe", "Skylar Mays", "Justinian Jessup", "Kenyon Martin Jr.", "Cassius Winston", "Cassius Stanley", "Jay Scrubb", "Grant Riller", "Reggie Perry", "Paul Reed", "Jalen Harris", "Sam Merrill")), y = TRB)) + 
+  geom_bar(position = "dodge", stat = "identity", width = 0.5) + 
+  scale_fill_viridis_d() + 
+  labs(title = "Second Round Rookie Center Rebounds Performance", x = "Players from Higest to Lowest Draft Pick", y = "Rebounds Per Game") + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# Display the bar chart
+print(plot_2_c)
+```
+
+```{r}
+# Create bar chart for first round rookies who registered as shooting guards
+# Creating levels allows x-axis to present player names in the order of draft picks (from left to right)
+plot_1_sg <- ggplot(merged_1_sg, aes(fill = year, x = factor(Player, levels = c("Anthony Edwards","James Wiseman","LaMelo Ball","Patrick Williams","Isaac Okoro","Onyeka Okongwu","Killian Hayes","Obi Toppin","Deni Avdija","Jalen Smith","Devin Vassell","Tyrese Haliburton","Kira Lewis Jr.","Aaron Nesmith","Cole Anthony","Isaiah Stewart","Aleksej Pokusevski","Josh Green","Saddiq Bey","Precious Achiuwa","Tyrese Maxey","Zeke Nnaji","Leandro Bolmaro","R.J. Hampton","Immanuel Quickley","Payton Pritchard","Udoka Azubuike","Jaden McDaniels","Malachi Flynn","Desmond Bane")), y = PTS)) + 
+  geom_bar(position = "dodge", stat = "identity", width = 0.5) + 
+  scale_fill_viridis_d() + 
+  labs(title = "First Round Rookie Shooting Guard Points Performance", x = "Players from Higest to Lowest Draft Pick", y = "Points Per Game") + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# Display the bar chart
+print(plot_1_sg)
+```
+
+```{r}
+# Create bar chart for second round rookies who registered as shooting guards
+# Creating levels allows x-axis to present player names in the order of draft picks (from left to right)
+plot_2_sg <- ggplot(merged_2_sg, aes(fill = year, x = factor(Player, levels = c("Tyrell Terry", "Vernon Carey Jr.", "Daniel Oturu", "Theo Maledon", "Xavier Tillman", "Tyler Bey", "Vit Krejci", "Saben Lee", "Elijah Hughes", "Robert Woodard II", "Tre Jones", "Nick Richards", "Jahmi'us Ramsey", "Marko Simonovic", "Jordan Nwora", "CJ Elleby", "Yam Madar", "Nico Mannion", "Isaiah Joe", "Skylar Mays", "Justinian Jessup", "Kenyon Martin Jr.", "Cassius Winston", "Cassius Stanley", "Jay Scrubb", "Grant Riller", "Reggie Perry", "Paul Reed", "Jalen Harris", "Sam Merrill")), y = PTS)) + 
+  geom_bar(position = "dodge", stat = "identity", width = 0.5) + 
+  scale_fill_viridis_d() + 
+  labs(title = "Second Round Rookie Shooting Guard Points Performance", x = "Players from Higest to Lowest Draft Pick", y = "Points Per Game") + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# Display the bar chart
+print(plot_2_sg)
+```
+
+We looked into three particular positions and analyzed their corresponding performances from 2020 to 2022: how many assists that point guards made, how many rebounds that centers made, and how many points that shooting guards scored. Each position has two corresponding graphs for round 1 and 2. Some common patterns observed among all three positions include:
+
+1. There are more players in Round 1 compared to Round 2. One possible explanation for this discrepancy is that Round 1 players are selected with higher expectations by their respective teams, leading to more opportunities for them in the league.
+
+2. More players from Round 1 participated in more seasons than those from Round 2, potentially due to the same reasons above. 
+
+3. As an example, among the point guards in Round 1, only one out of nine players competed for just one season, while four out of eight players in Round 2 competed for only one season. Additionally, four out of nine point guards in Round 1 successfully completed all three seasons, while only two out of eight players achieved the same in Round 2. 
+
+4. Players from Round 1 tend to exhibit better overall performance, particularly among point guards and centers. As an example, among the centers in Round 1, all players except one recorded at least 6 assists either throughout all the seasons they participated in or in the later seasons they joined. In contrast, the median assist number for centers in Round 2 is only two. However, the variance among shooting guards is significant, making it challenging to discern clear patterns from the graph.
+
+5. Players from Round 1 show a more stable improving trend over the three seasons compared to Round 2 players. As an example, among the shooting guards who competed in more than one season, all of them displayed an improving trend except for one who improved in 2021 and then had a little drawback in 2022. On the other hand, shooting guards from the second round displayed more erratic changes in their performance. Some players did not change much at all and others showed more significant variations in their performance, with changes ranging from three to five points. The inconsistency in performance among shooting guards from the second round poses challenges for teams, as it becomes difficult to predict what to expect from these players on the court. 
+
+## Further Questions
+
+We want to graph the performance trend of Round 1 players and compare it with Round 2 to investigate whether their trend shows a linear decline. Specifically, we want to determine if the performance level of players ranked lower can be inferred from the performance level of players ranked higher, or if as the rankings go down, the players' performance becomes more similar, forming a curved trend. Answering this question can help us better predict the potential of players in different positions.
