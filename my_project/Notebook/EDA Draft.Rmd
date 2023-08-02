@@ -71,10 +71,13 @@ The second website we used is Basketball Reference, which is part of Sports Refe
 
 ```{r}
 # Load all 4 datasets 
-draft_history <- read_csv("draft_history.csv")
-nba_2020 <- read_csv("nba_2020.csv")
-nba_2021 <- read_csv("nba_2021.csv")
-nba_2022 <- read_csv("nba_2022.csv")
+setwd("/Users/hk_cheng/Downloads/my_projectt/my_project")
+data_path <- "data"
+
+draft_history <- read_csv(file.path(data_path, "draft_history.csv"))
+nba_2020 <- read_csv(file.path(data_path, "nba_2020.csv"))
+nba_2021 <- read_csv(file.path(data_path, "nba_2021.csv"))
+nba_2022 <- read_csv(file.path(data_path, "nba_2022.csv"))
 ```
 
 ## Basic Data Processing
