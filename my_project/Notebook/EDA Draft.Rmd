@@ -7,6 +7,7 @@ author: Haokun Cheng and Penny Hong
 ```{r setup, include=FALSE}
 # Load all the packages needed
 knitr::opts_chunk$set(echo = TRUE)
+install.packages("pacman")
 pacman::p_load(tidyverse)
 library(ggplot2)
 library(viridisLite)
