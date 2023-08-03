@@ -1,0 +1,6 @@
+install.packages("tidyverse")
+install.packages("rmarkdown")
+install.packages("viridisLite")
+install.packages("patchwork")
+install.packages("RColorBrewer")
+install.packages("ggplot2")
