@@ -1,5 +1,5 @@
 ---
-title: "EDA Code Notebook Draft"
+title: "EDA Code Notebook"
 output: html_document
 author: Haokun Cheng and Penny Hong
 ---
