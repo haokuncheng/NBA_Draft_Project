@@ -19,3 +19,9 @@ Zihuai Hong (penny.hong@emory.edu)
 
 ## Project Description
 We obtained four datasets through two websites, Kaggle and Basketball Reference. One contains the list of NBA draft picks over the years along with their respective draft positions. The other three consist of game data for all NBA players in the 2020-2021, 2021-2022, and 2022-2023 seasons, respectively. With this information, we attempt to investigate the research question what is the correlation between draft decisions and the future performance of rookie players in the NBA by creating a regression model and analyzing it. We hypothesize that draft positions are the major factor that affects rookie players’ performance in NBA.
+
+## Getting Started
+
+1. Clone this repo (for help see this [tutorial](https://help.github.com/articles/cloning-a-repository/)).
+2. Raw Data is being kept within this repo (in the folder "data"). 
+3. Data processing scripts are being kept within this repo (in the folder "Notebook").
