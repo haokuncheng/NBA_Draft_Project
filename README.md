@@ -26,4 +26,5 @@ We obtained four datasets through two websites, Kaggle and Basketball Reference.
 2. Raw Data is being kept within this repo (in the folder "data"). 
 3. Data processing scripts are being kept within this repo (in the folder "Notebook").
 
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/haokuncheng/NBA_Draft_Project/binder)
+## Binder Badge
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/haokuncheng/NBA_Draft_Project/HEAD)
