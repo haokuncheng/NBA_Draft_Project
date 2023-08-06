@@ -1,5 +1,5 @@
 ---
-title: "EDA Code Notebook Draft"
+title: "EDA Code Notebook"
 author: "Haokun Cheng and Penny Hong"
 output:
   html_document:
